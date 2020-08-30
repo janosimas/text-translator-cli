@@ -39,17 +39,18 @@ fn main() {
         let language = translator.detect(text.to_string()).unwrap();
         println!("Input language: {:?}", language);
     } else {
-        let input_lang = value_t!(args, "input", Language).unwrap();
+        let input_lang = if args.is_present("input") {
+            InputLanguage::Defined(value_t!(args, "input", Language).unwrap())
+        } else {
+            InputLanguage::Automatic
+        };
+
         let output_lang = value_t!(args, "output", Language).unwrap();
         println!("input language: {:?}", input_lang);
         println!("output language: {:?}", output_lang);
 
         let translation = translator
-            .translate(
-                text.to_string(),
-                InputLanguage::Defined(input_lang),
-                output_lang,
-            )
+            .translate(text.to_string(), input_lang, output_lang)
             .unwrap();
         println!("translated text: {}", translation);
     }
